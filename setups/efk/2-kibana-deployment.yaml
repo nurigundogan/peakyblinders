@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana-np
+  namespace: peakyblinders
+spec:
+  selector: 
+    app: kibana
+  type: NodePort  
+  ports:
+    - port: 8080
+      targetPort: 5601 
+      nodePort: 30000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: peakyblinders
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: docker.elastic.co/kibana/kibana:7.5.0
+        resources:
+          limits:
+            cpu: 1000m
+          requests:
+            cpu: 100m
+        env:
+          - name: ELASTICSEARCH_URL
+            value: http://elasticsearch:9200
+        ports:
+        - containerPort: 5601
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+  name: kibana
+  namespace: peakyblinders
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: shelby.nurigundogan.net
+    http:
+      paths:
+        - pathType: Prefix
+          path: /
+          backend:
+            service:
+              name: kibana-np
+              port:
+                number: 8080
