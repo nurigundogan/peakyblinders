@@ -1,0 +1,5 @@
+---
+- hosts: aks
+  roles:
+    - k8s.nexus
+

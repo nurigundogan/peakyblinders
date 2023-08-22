@@ -1,0 +1,10 @@
+---
+nexus:
+  chart_name: stevehipwell
+  chart_version: "4.33.0"
+  chart_ref: stevehipwell/nexus3
+  repo_url: https://stevehipwell.github.io/helm-charts/
+
+  deployment:
+    name: nexus
+    namespace: peakyblinders

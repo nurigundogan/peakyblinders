@@ -1,0 +1,33 @@
+---
+- name: Add bitnami helm repo
+  community.kubernetes.helm_repository:
+    name: "{{ jenkins.chart_name }}"
+    repo_url: "{{ jenkins.repo_url }}"
+
+- name: Create temporary render directory
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: template-render-
+  register: render_dir
+
+- name: Render values file
+  template:
+    src: jenkins-values.yml.j2
+    dest: "{{ render_dir.path }}/jenkins-values.yml"
+
+- name: Install jenkins
+  community.kubernetes.helm:
+    name: "{{ jenkins.deployment.name }}"
+    chart_ref: "{{ jenkins.chart_ref }}"
+    chart_version: "{{ jenkins.chart_version }}"
+    values_files:
+      - "{{ render_dir.path }}/jenkins-values.yml"
+    release_namespace: "{{ jenkins.deployment.namespace }}"
+    create_namespace: true
+    update_repo_cache: true
+
+- name: wait for jenkins deployment
+  shell:
+    cmd: |
+      kubectl rollout status statefulset -n {{ jenkins.deployment.namespace }} jenkins
+  changed_when: false

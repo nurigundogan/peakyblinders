@@ -1,0 +1,10 @@
+---
+jenkins:
+  chart_name: jenkinsci
+  chart_version: "4.5.0"
+  chart_ref: jenkinsci/jenkins
+  repo_url: https://charts.jenkins.io/
+
+  deployment:
+    name: jenkins
+    namespace: peakyblinders

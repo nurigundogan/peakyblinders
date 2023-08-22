@@ -1,0 +1,33 @@
+---
+- name: Add bitnami helm repo
+  community.kubernetes.helm_repository:
+    name: "{{ nexus.chart_name }}"
+    repo_url: "{{ nexus.repo_url }}"
+
+- name: Create temporary render directory
+  ansible.builtin.tempfile:
+    state: directory
+    prefix: template-render-
+  register: render_dir
+
+- name: Render values file
+  template:
+    src: nexus-values.yml.j2
+    dest: "{{ render_dir.path }}/nexus-values.yml"
+
+- name: Install nexus
+  community.kubernetes.helm:
+    name: "{{ nexus.deployment.name }}"
+    chart_ref: "{{ nexus.chart_ref }}"
+    chart_version: "{{ nexus.chart_version }}"
+    values_files:
+      - "{{ render_dir.path }}/nexus-values.yml"
+    release_namespace: "{{ nexus.deployment.namespace }}"
+    create_namespace: true
+    update_repo_cache: true
+
+- name: wait for nexus deployment
+  shell:
+    cmd: |
+      kubectl rollout status statefulset -n {{ nexus.deployment.namespace }} nexus
+  changed_when: false
