@@ -1,0 +1,5 @@
+setups/aks/.connection.env
+setups/aks/terraform.*
+setups/aks/.terraform.*
+setups/aks/.terraform/
+setups/aks/aks_kubeconfig
