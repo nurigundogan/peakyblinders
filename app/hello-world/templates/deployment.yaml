@@ -24,7 +24,7 @@ spec:
           | default .Chart.AppVersion }}
         name: hello-world
         ports:
-        - containerPort: 5000
+        - containerPort: 80
         resources: {{- toYaml .Values.helloWorld.helloWorld.resources | nindent 10 }}
       imagePullSecrets:
       - name: dockercred

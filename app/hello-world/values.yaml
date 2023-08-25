@@ -14,7 +14,7 @@ helloWorld:
   - name: http
     port: 80
     protocol: TCP
-    targetPort: 5000
+    targetPort: 80
   replicas: 1
   type: ClusterIP
 kubernetesClusterDomain: cluster.local
