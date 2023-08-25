@@ -2,7 +2,7 @@ helloWorld:
   helloWorld:
     image:
       repository: grace-registry.nurigundogan.net/hello-world
-      tag: ${BUILD_NUMBER}
+      tag:
     resources:
       limits:
         cpu: "1"
