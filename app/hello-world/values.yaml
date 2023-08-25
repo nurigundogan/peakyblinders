@@ -2,7 +2,7 @@ helloWorld:
   helloWorld:
     image:
       repository: grace-registry.nurigundogan.net/hello-world
-      tag:
+      tag: 1
     resources:
       limits:
         cpu: "1"
