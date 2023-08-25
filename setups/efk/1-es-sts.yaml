@@ -22,7 +22,7 @@ metadata:
   namespace: peakyblinders
 spec:
   serviceName: elasticsearch
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: elasticsearch
@@ -88,7 +88,6 @@ spec:
         app: elasticsearch
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      # storageClassName: ""
       resources:
         requests:
           storage: 3Gi

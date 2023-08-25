@@ -29,5 +29,5 @@
 - name: wait for nexus deployment
   shell:
     cmd: |
-      kubectl rollout status statefulset -n {{ nexus.deployment.namespace }} nexus
+      kubectl rollout status deployment -n {{ nexus.deployment.namespace }} nexus
   changed_when: false
