@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hello-world.fullname" . }}-hello-world
+  labels:
+  {{- include "hello-world.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.helloWorld.replicas }}
+  selector:
+    matchLabels:
+      run: hello-world
+    {{- include "hello-world.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        run: hello-world
+      {{- include "hello-world.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.helloWorld.helloWorld.image.repository }}:{{ .Values.helloWorld.helloWorld.image.tag
+          | default .Chart.AppVersion }}
+        name: hello-world
+        ports:
+        - containerPort: 5000
+        resources: {{- toYaml .Values.helloWorld.helloWorld.resources | nindent 10 }}
+      imagePullSecrets:
+      - name: dockercred

@@ -1,0 +1,20 @@
+helloWorld:
+  helloWorld:
+    image:
+      repository: grace-registry.nurigundogan.net/hello-world
+      tag: ${BUILD_NUMBER}
+    resources:
+      limits:
+        cpu: "1"
+        memory: 1Gi
+      requests:
+        cpu: 100m
+        memory: 250Mi
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 5000
+  replicas: 1
+  type: ClusterIP
+kubernetesClusterDomain: cluster.local
