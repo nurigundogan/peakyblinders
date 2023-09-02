@@ -1,0 +1,83 @@
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+        apiVersion: v1
+        kind: Pod
+        spec:
+          containers:
+          - name: dotnet
+            image: mcr.microsoft.com/dotnet/sdk:6.0
+            command:
+            - sleep
+            args:
+            - 1d
+          - name: helm
+            image: dtzar/helm-kubectl
+            command:
+            - sleep
+            args:
+            - 1d
+          - name: kaniko
+            image: gcr.io/kaniko-project/executor:debug
+            command:
+            - sleep
+            args:
+            - 1d
+            volumeMounts:
+            - name: kaniko-secret
+              mountPath: /kaniko/.docker
+          restartPolicy: Never
+          volumes:
+          - name: kaniko-secret
+            secret:
+                secretName: dockercred
+                items:
+                - key: .dockerconfigjson
+                  path: config.json
+        '''
+    }
+  }
+      stages {
+        stage('SCM') {
+          steps {
+              git branch: 'main', changelog: false, poll: false, url: 'https://github.com/nurigundogan/peakyblinders.git'
+            }   
+        }
+        stage('Test') {
+          steps {
+              container('dotnet') {
+              sh '''
+              cd app/ && dotnet test
+              '''
+            }   
+          }
+        }        
+        stage('Build Image') {
+          steps {
+              container('kaniko') {
+              sh '''
+              /kaniko/executor --context `pwd`/app/ \
+                               --dockerfile `pwd`/app/Dockerfile \
+                               --destination=grace-registry.nurigundogan.net/hello-world:${BUILD_NUMBER} \
+                               --insecure \
+                               --skip-tls-verify
+              '''
+            }
+          }
+        }
+        stage('Deploy') {
+          steps {
+              container('helm') {
+                  withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                      sh '''
+                      cat $KUBECONFIG > `pwd`/kubeconfig
+                      export KUBECONFIG=`pwd`/kubeconfig
+                      helm upgrade --install hello-world ./app/hello-world --set helloWorld.helloWorld.image.tag=${BUILD_NUMBER} -n peakyblinders
+                      '''
+              }
+            }  
+          }
+        }
+    }
+}

@@ -28,6 +28,19 @@ cd setups/efk
 k apply -f .
 ```
 
+## OTHER STEPS
+#### CREATE SECRET FOR NEXUS
+```
+k create secret docker-registry dockercred -n peakyblinders \
+    --docker-server=http://grace-registry.nurigundogan.net \
+    --docker-username=admin \
+    --docker-password=<password>
+```
+#### LOGIN TEST FOR NEXUS
+```
+docker login -u admin -p <password> grace-registry.nurigundogan.net
+```
+
 ## RELATED URLS
 ```
 http://thomas.nurigundogan.net           / Jenkins
